@@ -18,5 +18,7 @@
 }
 
 body {
-  @apply font-sans;
+  @apply font-sans bg-gray-400;
+  padding: 2.5rem 5.5rem;
+  height: 100vh;
 }

@@ -1,5 +1,5 @@
-import * as React from "react";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { Header } from "../layout/Header";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -7,9 +7,10 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <React.Fragment>
-      <div>Hello "__root"!</div>
+    <div className="flex flex-col w-full">
+      <Header />
+
       <Outlet />
-    </React.Fragment>
+    </div>
   );
 }

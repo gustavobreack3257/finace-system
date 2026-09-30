@@ -1,7 +1,7 @@
 import LogoSVG from "../assets/Logo.svg";
 export function Header() {
   return (
-    <div className="flex justify-between items-center sm:w-full">
+    <div className="flex justify-between items-center w-full">
       <img src={LogoSVG} alt="Logo" />
 
       <div className="flex gap-2 items-center">

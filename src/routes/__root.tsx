@@ -7,7 +7,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full gap-10">
       <Header />
 
       <Outlet />

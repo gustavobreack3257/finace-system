@@ -1,18 +1,23 @@
+import { Link } from "@tanstack/react-router";
 import LogoSVG from "../assets/Logo.svg";
 export function Header() {
   return (
     <div className="flex justify-between items-center w-full">
-      <img src={LogoSVG} alt="Logo" />
+      <Link to="/">
+        <img src={LogoSVG} alt="Logo" />
+      </Link>
 
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-4 items-center">
         <p>Solicitação de reembolso</p>
 
-        <button
-          type="button"
-          className="items-center h-12 w-38 rounded-lg bg-accent-brand text-sm text-white font-bold"
-        >
-          Nova solicitação
-        </button>
+        <Link to="/reembolso/$id" params={{ id: "refund-id" }}>
+          <button
+            type="button"
+            className="items-center h-12 w-38 rounded-lg bg-accent-brand text-sm text-white font-bold cursor-pointer hover:bg-accent-brand-light transition duration-200"
+          >
+            Nova solicitação
+          </button>
+        </Link>
       </div>
     </div>
   );

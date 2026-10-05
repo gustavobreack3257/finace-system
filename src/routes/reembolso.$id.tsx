@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import NoteSVG from "../assets/Note.svg";
+import { CaretDownIcon } from "@phosphor-icons/react";
+import * as Dialog from "@radix-ui/react-dialog";
+import * as Select from "@radix-ui/react-select";
+import { DeleteRefundModal } from "../components/delete-refund-modal";
 export const Route = createFileRoute("/reembolso/$id")({
   component: RouteComponent,
 });
@@ -29,14 +33,57 @@ function RouteComponent() {
             </label>
 
             <div className="flex justify-between">
-              <label htmlFor="" className="flex flex-col gap-2 text-gray-200">
+              <Select.Root>
+                <Select.Group>
+                  <div className="flex flex-col gap-2">
+                    <Select.Label className="flex flex-col gap-2 text-gray-200">
+                      Categoria
+                    </Select.Label>
+                    <Select.Trigger className="flex p-4 w-full min-w-2xs rounded-lg border border-gray-300 h-12 text-gray-200 placeholder:text-gray-200 focus:border-2 focus:border-accent-brand-light justify-between items-center">
+                      <Select.Value placeholder="Escolha a categoria" />
+
+                      <Select.Icon className="flex items-center justify-center">
+                        <CaretDownIcon />
+                      </Select.Icon>
+                    </Select.Trigger>
+                  </div>
+
+                  <Select.Portal>
+                    <Select.Content className=" z-50 rounded-lg border border-gray-300 bg-gray-500 shadow-lg ">
+                      <Select.Viewport className="flex flex-col gap-2 p-5">
+                        <Select.Item value="alimentação">
+                          <Select.ItemText>Alimentação</Select.ItemText>
+                        </Select.Item>
+
+                        <Select.Item value="hospedagem">
+                          <Select.ItemText>Hospedagem</Select.ItemText>
+                        </Select.Item>
+
+                        <Select.Item value="transporte">
+                          <Select.ItemText>Transporte</Select.ItemText>
+                        </Select.Item>
+
+                        <Select.Item value="servicos">
+                          <Select.ItemText>Serviços</Select.ItemText>
+                        </Select.Item>
+
+                        <Select.Item value="outros">
+                          <Select.ItemText>Outros</Select.ItemText>
+                        </Select.Item>
+                      </Select.Viewport>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Group>
+              </Select.Root>
+
+              {/*  <label htmlFor="" className="flex flex-col gap-2 text-gray-200">
                 Categoria
                 <input
                   type="text"
                   className="flex p-4 w-full min-w-2xs rounded-lg border border-gray-300 h-12 text-gray-200 placeholder:text-gray-200 focus:border-2 focus:border-accent-brand-light"
                   placeholder="Escolha as opções de Categoria"
                 />
-              </label>
+              </label> */}
 
               <label htmlFor="" className="flex flex-col gap-2 text-gray-200">
                 Valor
@@ -56,13 +103,22 @@ function RouteComponent() {
                 </span>
               </button>
             </div>
+            <Dialog.Root>
+              <Dialog.Trigger asChild>
+                <button
+                  type="button"
+                  className="flex w-full justify-center items-center bg-accent-brand h-12 text-white text-sm font-bold rounded-lg hover:bg-accent-brand-light"
+                >
+                  Excluir
+                </button>
+              </Dialog.Trigger>
 
-            <button
-              type="button"
-              className="flex justify-center items-center bg-accent-brand h-12 text-white text-sm font-bold"
-            >
-              Excluir
-            </button>
+              <Dialog.Portal>
+                <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+
+                <DeleteRefundModal />
+              </Dialog.Portal>
+            </Dialog.Root>
           </div>
         </div>
       </main>

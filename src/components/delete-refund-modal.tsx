@@ -4,17 +4,19 @@ export function DeleteRefundModal() {
   return (
     <Dialog.Content
       className="
+
         fixed
         left-1/2
         top-1/2
         z-50
+        h-56
         w-full
-        max-w-md
+        max-w-lg
         -translate-x-1/2
         -translate-y-1/2
         rounded-2xl
         bg-gray-500
-        p-8
+        p-10
       "
     >
       <Dialog.Title className="text-xl font-bold text-gray-100">
@@ -26,7 +28,7 @@ export function DeleteRefundModal() {
         irreversível.
       </Dialog.Description>
 
-      <div className="mt-8 flex justify-end gap-3">
+      <div className="mt-6 flex justify-end gap-3">
         <Dialog.Close asChild>
           <button type="button" className="rounded-lg px-4 py-2">
             Cancelar

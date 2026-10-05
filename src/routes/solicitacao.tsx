@@ -1,5 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
-import NoteSVG from "../assets/Note.svg";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Select from "@radix-ui/react-select";
@@ -92,15 +91,18 @@ function RouteComponent() {
 
             <div className="flex items-center">
               <label className="flex flex-col w-full gap-2 text-gray-200">
-                Valor
+                Comprovante
                 <div className="flex items-center justify-end">
                   <input
                     type="text"
                     className="flex p-4 w-full rounded-lg border border-gray-300 h-12 text-gray-200 placeholder:text-gray-200 focus:border-2 focus:border-accent-brand-light"
-                    placeholder="Digite o valor do reembolso"
+                    placeholder="Nome do arquivo .pdf"
                   />
 
-                  <button className="flex h-12 w-12 p-3 bg-accent-brand rounded-lg absolute hover:bg-accent-brand-light">
+                  <button
+                    type="button"
+                    className="flex h-12 w-12 p-3 bg-accent-brand rounded-lg absolute hover:bg-accent-brand-light"
+                  >
                     <CloudArrowUpIcon className="h-6 w-6 text-gray-500 " />
                   </button>
                 </div>
@@ -108,12 +110,14 @@ function RouteComponent() {
             </div>
             <Dialog.Root>
               <Dialog.Trigger asChild>
-                <button
-                  type="button"
-                  className="flex w-full justify-center items-center bg-accent-brand h-12 text-white text-sm font-bold rounded-lg hover:bg-accent-brand-light"
-                >
-                  Enviar
-                </button>
+                <Link to="/sucesso">
+                  <button
+                    type="button"
+                    className="flex w-full justify-center items-center bg-accent-brand h-12 text-white text-sm font-bold rounded-lg hover:bg-accent-brand-light cursor-pointer"
+                  >
+                    Enviar
+                  </button>
+                </Link>
               </Dialog.Trigger>
 
               <Dialog.Portal>

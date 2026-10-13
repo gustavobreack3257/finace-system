@@ -1,133 +1,249 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-
-import * as Dialog from "@radix-ui/react-dialog";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useRef, useState } from "react";
 import * as Select from "@radix-ui/react-select";
-
 import { CaretDownIcon, CloudArrowUpIcon } from "@phosphor-icons/react";
 
-import { DeleteRefundModal } from "../components/delete-refund-modal";
+import type { z } from "zod";
+
+import type { CreateSolicitationRefundSchema } from "../utils/create-solicitation-refund-schema";
+import { useCreateRefunds } from "../hooks/create-refunds";
 
 export const Route = createFileRoute("/solicitacao")({
   component: RouteComponent,
 });
 
-function RouteComponent() {
-  return (
-    <div className="flex flex-col gap-6 items-center">
-      <main className="flex flex-col max-w-3xl bg-gray-500 p-10 rounded-2xl ">
-        <div className="flex flex-col gap-10">
-          <header className="flex flex-col w-lg gap-3">
-            <h1 className="font-bold text-xl text-gray-100 ">
-              Solicitação de reembolso
-            </h1>
-            <p className="text-sm text-gray-200">
-              Dados da despesa para solicitar reembolso.
-            </p>
-          </header>
+type SolicitationFormData = z.infer<typeof CreateSolicitationRefundSchema>;
 
-          <div className="flex flex-col gap-8">
-            <label htmlFor="" className="flex flex-col gap-2 text-gray-200">
+function RouteComponent() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState("");
+
+  const { form, createRefund, isCreating } = useCreateRefunds();
+
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = form;
+
+  const selectedCategory = watch("category");
+
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    setFileName(file.name);
+
+    setValue("receiptFile", file, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  }
+
+  async function onSubmit(data: SolicitationFormData) {
+    try {
+      await createRefund(data);
+
+      await navigate({
+        to: "/sucesso",
+      });
+    } catch (error) {
+      console.error("Erro ao criar reembolso", error);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-[#E5EDEA] px-4 py-10">
+      <main className="mx-auto w-full max-w-lg rounded-2xl bg-[#F8FAF9] p-6 sm:p-10">
+        <header className="mb-10">
+          <h1 className="text-xl font-bold text-[#252C29]">
+            Nova solicitação de reembolso
+          </h1>
+
+          <p className="mt-2 text-sm text-[#65716C]">
+            Dados da despesa para solicitar reembolso.
+          </p>
+        </header>
+
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          className="flex flex-col gap-6"
+        >
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="title"
+              className="text-[10px] uppercase text-[#52615C]"
+            >
               Nome da solicitação
-              <input
-                type="text"
-                className="flex p-4 w-full rounded-lg border border-gray-300 h-12 text-gray-200 placeholder:text-gray-200 focus:border-2 focus:border-accent-brand-light"
-                placeholder="Digite o nome da solicitação"
-              />
             </label>
 
-            <div className="flex justify-between">
-              <Select.Root>
-                <Select.Group>
-                  <div className="flex flex-col gap-2">
-                    <Select.Label className="flex flex-col gap-2 text-gray-200">
-                      Categoria
-                    </Select.Label>
-                    <Select.Trigger className="flex p-4 w-full min-w-2xs rounded-lg border border-gray-300 h-12 text-gray-200 placeholder:text-gray-200 focus:border-2 focus:border-accent-brand-light justify-between items-center">
-                      <Select.Value placeholder="Escolha a categoria" />
+            <input
+              id="title"
+              {...register("title")}
+              className="h-12 w-full rounded-lg border border-[#CBD5D1] bg-transparent px-4 text-sm text-[#52615C] outline-none focus:border-2 focus:border-[#20885D]"
+            />
 
-                      <Select.Icon className="flex items-center justify-center">
-                        <CaretDownIcon />
-                      </Select.Icon>
-                    </Select.Trigger>
-                  </div>
+            {errors.title && (
+              <p className="text-xs text-accent-brand-light">
+                {errors.title.message}
+              </p>
+            )}
+          </div>
 
-                  <Select.Portal>
-                    <Select.Content className=" z-50 rounded-lg border border-gray-300 bg-gray-500 shadow-lg ">
-                      <Select.Viewport className="flex flex-col gap-2 p-5">
-                        <Select.Item value="alimentação">
-                          <Select.ItemText>Alimentação</Select.ItemText>
-                        </Select.Item>
+          <div className="grid grid-cols-[1fr_155px] gap-4">
+            <div className="flex min-w-0 flex-col gap-2">
+              <label className="text-[10px] uppercase text-[#52615C]">
+                Categoria
+              </label>
 
-                        <Select.Item value="hospedagem">
-                          <Select.ItemText>Hospedagem</Select.ItemText>
-                        </Select.Item>
+              <Select.Root
+                value={selectedCategory}
+                onValueChange={(value) =>
+                  setValue(
+                    "category",
+                    value as SolicitationFormData["category"],
+                    {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    },
+                  )
+                }
+              >
+                <Select.Trigger className="flex h-12 w-full items-center justify-between rounded-lg border border-[#CBD5D1] bg-transparent px-4 text-sm text-[#52615C] outline-none focus:border-2 focus:border-[#20885D]">
+                  <Select.Value placeholder="Selecione" />
+                  <Select.Icon>
+                    <CaretDownIcon />
+                  </Select.Icon>
+                </Select.Trigger>
 
-                        <Select.Item value="transporte">
-                          <Select.ItemText>Transporte</Select.ItemText>
-                        </Select.Item>
+                <Select.Portal>
+                  <Select.Content className="z-50 rounded-lg border border-[#CBD5D1] bg-[#F8FAF9] shadow-lg">
+                    <Select.Viewport className="p-2">
+                      <Select.Item
+                        value="food"
+                        className="cursor-pointer rounded px-3 py-2 text-sm outline-none hover:bg-[#E5EDEA]"
+                      >
+                        <Select.ItemText>Alimentação</Select.ItemText>
+                      </Select.Item>
 
-                        <Select.Item value="servicos">
-                          <Select.ItemText>Serviços</Select.ItemText>
-                        </Select.Item>
+                      <Select.Item
+                        value="hosting"
+                        className="cursor-pointer rounded px-3 py-2 text-sm outline-none hover:bg-[#E5EDEA]"
+                      >
+                        <Select.ItemText>Hospedagem</Select.ItemText>
+                      </Select.Item>
 
-                        <Select.Item value="outros">
-                          <Select.ItemText>Outros</Select.ItemText>
-                        </Select.Item>
-                      </Select.Viewport>
-                    </Select.Content>
-                  </Select.Portal>
-                </Select.Group>
+                      <Select.Item
+                        value="transport"
+                        className="cursor-pointer rounded px-3 py-2 text-sm outline-none hover:bg-[#E5EDEA]"
+                      >
+                        <Select.ItemText>Transporte</Select.ItemText>
+                      </Select.Item>
+
+                      <Select.Item
+                        value="services"
+                        className="cursor-pointer rounded px-3 py-2 text-sm outline-none hover:bg-[#E5EDEA]"
+                      >
+                        <Select.ItemText>Serviços</Select.ItemText>
+                      </Select.Item>
+
+                      <Select.Item
+                        value="other"
+                        className="cursor-pointer rounded px-3 py-2 text-sm outline-none hover:bg-[#E5EDEA]"
+                      >
+                        <Select.ItemText>Outros</Select.ItemText>
+                      </Select.Item>
+                    </Select.Viewport>
+                  </Select.Content>
+                </Select.Portal>
               </Select.Root>
 
-              <label htmlFor="" className="flex flex-col gap-2 text-gray-200">
+              {errors.category && (
+                <p className="text-xs text-accent-brand-light">
+                  {errors.category.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex min-w-0 flex-col gap-2">
+              <label
+                htmlFor="value"
+                className="text-[10px] uppercase text-[#52615C]"
+              >
                 Valor
-                <input
-                  type="text"
-                  className="flex p-4 rounded-lg border border-gray-300 h-12 text-gray-200 placeholder:text-gray-200 focus:border-2 focus:border-accent-brand-light"
-                  placeholder="Digite o valor do reembolso"
-                />
               </label>
+
+              <input
+                id="value"
+                {...register("value")}
+                type="text"
+                inputMode="decimal"
+                placeholder="0,00"
+                className="h-12 w-full rounded-lg border border-[#CBD5D1] bg-transparent px-4 text-sm text-[#52615C] outline-none placeholder:text-[#52615C] focus:border-2 focus:border-[#20885D]"
+              />
+
+              {errors.value && (
+                <p className="text-xs text-accent-brand-light">
+                  {errors.value.message}
+                </p>
+              )}
             </div>
-
-            <div className="flex items-center">
-              <label className="flex flex-col w-full gap-2 text-gray-200">
-                Comprovante
-                <div className="flex items-center justify-end">
-                  <input
-                    type="text"
-                    className="flex p-4 w-full rounded-lg border border-gray-300 h-12 text-gray-200 placeholder:text-gray-200 focus:border-2 focus:border-accent-brand-light"
-                    placeholder="Nome do arquivo .pdf"
-                  />
-
-                  <button
-                    type="button"
-                    className="flex h-12 w-12 p-3 bg-accent-brand rounded-lg absolute hover:bg-accent-brand-light"
-                  >
-                    <CloudArrowUpIcon className="h-6 w-6 text-gray-500 " />
-                  </button>
-                </div>
-              </label>
-            </div>
-            <Dialog.Root>
-              <Dialog.Trigger asChild>
-                <Link to="/sucesso">
-                  <button
-                    type="button"
-                    className="flex w-full justify-center items-center bg-accent-brand h-12 text-white text-sm font-bold rounded-lg hover:bg-accent-brand-light cursor-pointer"
-                  >
-                    Enviar
-                  </button>
-                </Link>
-              </Dialog.Trigger>
-
-              <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-
-                <DeleteRefundModal />
-              </Dialog.Portal>
-            </Dialog.Root>
           </div>
-        </div>
+
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="input-file"
+              className="text-[10px] uppercase text-[#52615C]"
+            >
+              Comprovante
+            </label>
+
+            <div className="flex h-12 w-full items-center overflow-hidden rounded-lg border border-[#CBD5D1]">
+              <span
+                className="min-w-0 flex-1 truncate px-4 text-sm text-[#52615C]"
+                title={fileName}
+              >
+                {fileName || "Nome do arquivo.pdf"}
+              </span>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+
+              <button
+                type="button"
+                aria-label="Selecionar comprovante"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-12 w-12 shrink-0 items-center justify-center bg-[#20885D] text-white hover:bg-[#176F4B]"
+              >
+                <CloudArrowUpIcon size={24} />
+              </button>
+            </div>
+
+            {errors.receiptFile && (
+              <p className="text-xs text-accent-brand-light">
+                {errors.receiptFile.message}
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="mt-1 flex h-12 w-full items-center justify-center rounded-lg bg-[#20885D] text-sm font-bold text-white hover:bg-[#176F4B] cursor-pointer"
+          >
+            Enviar
+          </button>
+        </form>
       </main>
     </div>
   );

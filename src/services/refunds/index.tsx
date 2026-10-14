@@ -5,6 +5,7 @@ import type {
   CreateReceiptResponse,
   CreateRefundProps,
   CreateRefundResponse,
+  RefundProps,
 } from "../refunds/types";
 import { queryOptions } from "@tanstack/react-query";
 
@@ -18,6 +19,12 @@ export async function getRefundsRequest({
       q: search,
     },
   });
+
+  return data;
+}
+
+export async function getRefundByIdRequest(id: string) {
+  const { data } = await api.get<{ refund: RefundProps }>(`/refunds/${id}`);
 
   return data;
 }
@@ -44,6 +51,18 @@ export async function createRefundRequest(
   refund: CreateRefundProps,
 ): Promise<CreateRefundResponse> {
   const { data } = await api.post<CreateRefundResponse>("/refunds", refund);
+
+  return data;
+}
+
+export async function getReceiptDownloadUrlRequest(id: string) {
+  const { data } = await api.get<{ url: string }>(`/receipts/download/${id}`);
+
+  return data.url;
+}
+
+export async function deleteRefundRequest(id: string) {
+  const { data } = await api.delete(`/refunds/${id}`);
 
   return data;
 }

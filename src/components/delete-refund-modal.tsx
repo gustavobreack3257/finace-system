@@ -1,6 +1,14 @@
 import * as Dialog from "@radix-ui/react-dialog";
 
-export function DeleteRefundModal() {
+type DeleteRefundModalProps = {
+  onConfirm: () => void;
+  isDeleting: boolean;
+};
+
+export function DeleteRefundModal({
+  onConfirm,
+  isDeleting,
+}: DeleteRefundModalProps) {
   return (
     <Dialog.Content
       className="
@@ -30,14 +38,19 @@ export function DeleteRefundModal() {
 
       <div className="mt-6 flex justify-end gap-3">
         <Dialog.Close asChild>
-          <button type="button" className="rounded-lg px-4 py-2">
+          <button
+            type="button"
+            className="rounded-lg px-4 py-2  hover:text-accent-brand"
+          >
             Cancelar
           </button>
         </Dialog.Close>
 
         <button
           type="button"
-          className="rounded-lg bg-accent-brand px-4 py-2 text-white"
+          onClick={onConfirm}
+          disabled={isDeleting}
+          className="rounded-lg bg-accent-brand hover:bg-accent-brand-light px-4 py-2 text-white"
         >
           Confirmar
         </button>

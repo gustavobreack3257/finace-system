@@ -17,6 +17,7 @@ type SolicitationFormData = z.infer<typeof CreateSolicitationRefundSchema>;
 function RouteComponent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { form, createRefund, isCreating } = useCreateRefunds();
 
@@ -46,6 +47,7 @@ function RouteComponent() {
   }
 
   async function onSubmit(data: SolicitationFormData) {
+    setErrorMessage("");
     try {
       await createRefund(data);
 
@@ -54,6 +56,8 @@ function RouteComponent() {
       });
     } catch (error) {
       console.error("Erro ao criar reembolso", error);
+
+      setErrorMessage("Não foi possível criar a solicitação. Tente novamente.");
     }
   }
 
@@ -98,7 +102,10 @@ function RouteComponent() {
 
           <div className="grid grid-cols-[1fr_155px] gap-4">
             <div className="flex min-w-0 flex-col gap-2">
-              <label className="text-[10px] uppercase text-[#52615C]">
+              <label
+                htmlFor="category"
+                className="text-[10px] uppercase text-[#52615C]"
+              >
                 Categoria
               </label>
 
@@ -237,11 +244,18 @@ function RouteComponent() {
             )}
           </div>
 
+          {errorMessage && (
+            <p role="alert" className="text-sm text-accent-brand-light">
+              {errorMessage}
+            </p>
+          )}
+
           <button
             type="submit"
+            disabled={isCreating}
             className="mt-1 flex h-12 w-full items-center justify-center rounded-lg bg-[#20885D] text-sm font-bold text-white hover:bg-[#176F4B] cursor-pointer"
           >
-            Enviar
+            {isCreating ? "Enviando..." : "Enviar"}
           </button>
         </form>
       </main>
